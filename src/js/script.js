@@ -1,3 +1,6 @@
+{
+  'use strict';
+
 const select = {
   templateOf: {
     templateBook: '#template-book',
@@ -9,6 +12,7 @@ const select = {
 };
 
 const templates = {
+
   templateBook: Handlebars.compile(document.querySelector(select.templateOf.templateBook).innerHTML),
   };
 
@@ -38,15 +42,17 @@ const templates = {
 
   function initActions() {
     let favoriteBooks = [];
-    const booksImage = document.querySelectorAll(select.containerOf.bookImg);
+    document.querySelector(select.containerOf.booksList).addEventListener('click', function(element) {
+      element.preventDefault();
+      console.log(element.target.offsetParent);
     for (let bookImage of booksImage) {
       bookImage.addEventListener('dblclick', function (element) {
         element.preventDefault();
-        if (!(favoriteBooks.includes(bookImage.getAttribute('data-id')))) {
-          favoriteBooks.push(bookImage.getAttribute('data-id'));
+        if (!(favoriteBooks.includes(element.target.offsetParent.getAttribute('data-id'))) && e.target.offsetParent.classList.contains('book__image')) {
+          favoriteBooks.push(element.target.offsetParent.getAttribute('data-id'));
           bookImage.classList.add('favorite');
-        } else {
-          bookImage.classList.remove('favorite');
+        } else if ((favouriteBooks.includes(element.target.offsetParent.getAttribute('data-id'))) &element.target.offsetParent.classList.contains('book_image')){
+          element.target.offsetParent.classList.remove('favorite');
           const bookIndex = favoriteBooks.indexOf(bookImage.getAttribute('data-id'));
           favoriteBooks.splice(bookIndex, 1);
         }
@@ -54,3 +60,4 @@ const templates = {
       });
     }
   }
+}
