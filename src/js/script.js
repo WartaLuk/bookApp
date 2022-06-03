@@ -10,6 +10,11 @@
       filters: '.filters'
     }
   };
+
+  const templates = {
+    templateBook: Handlebars.compile(document.querySelector(select.templateOf.templateBook).innerHTML),
+  };
+
   class BooksList {
     constructor() {
       this.initData();
@@ -22,42 +27,47 @@
       this.data = dataSource.books;
     }
     render() {
-      for (let book in this.data) {
+      for (const book of this.data) {
         const HTMLData = {
-          name: this.data[book].name,
-          price: this.data[book].price,
-          rating: this.data[book].rating,
-          image: this.data[book].image,
-          id: this.data[book].id,
-          ratingWidth: this.data[book].rating * 10,
-          ratingBgc: this.setBarColor(this.data[book].rating)
+          name: book.name,
+          price: book.price,
+          rating: book.rating,
+          image: book.image,
+          id: book.id,
+          ratingWidth: book.rating * 10,
+          ratingBgc: this.setBarColor(book.rating)
         };
 
-        const templates = {
-          templateBook: Handlebars.compile(document.querySelector(select.templateOf.templateBook).innerHTML),
-        };
+   
         const generatedHTML = templates.templateBook(HTMLData);
-        book = utils.createDOMFromHTML(generatedHTML);
+        const bookElem = utils.createDOMFromHTML(generatedHTML);
         const bookContainer = document.querySelector(select.containerOf.booksList);
-        bookContainer.appendChild(book);
+        bookContainer.appendChild(bookElem);
       }
     }
+
     initActions() {
       this.filters = [];
-      let favoriteBooks = [];
+      const favoriteBooks = [];
+
       document.querySelector(select.containerOf.booksList).addEventListener('dblclick', function (element) {
         element.preventDefault();
         console.log(element.target.offsetParent);
-        if (!(favoriteBooks.includes(element.target.offsetParent.getAttribute('data-id'))) && element.target.offsetParent.classList.contains('book__image')) {
-          favoriteBooks.push(element.target.offsetParent.getAttribute('data-id'));
-          element.target.offsetParent.classList.add('favorite');
-        }
-        else if ((favoriteBooks.includes(element.target.offsetParent.getAttribute('data-id'))) && element.target.offsetParent.classList.contains('book__image')) {
-          element.target.offsetParent.classList.remove('favorite');
-          const bookIndex = favoriteBooks.indexOf(element.target.offsetParent.getAttribute('data-id'));
-          favoriteBooks.splice(bookIndex, 1);
+        if(element.target.offsetParent.classList.contains('book__image')) {
+
+          const bookId = element.target.offsetParent.getAttribute('data-id');
+          element.target.offsetParent.classList.toggle('favorite');
+
+          if (!(favoriteBooks.includes(bookId))) {
+            favoriteBooks.push(bookId);
+          }
+          else {
+            const bookIndex = favoriteBooks.indexOf(bookId);
+            favoriteBooks.splice(bookIndex, 1);
+          }
         }
       });
+
       document.querySelector(select.containerOf.filters).addEventListener('click', (element) => {
         if (element.target.tagName == 'INPUT' && element.target.type == 'checkbox' && element.target.name == 'filter') {
           console.log('this', this);
@@ -65,7 +75,7 @@
             console.log('this.filters', this.filters);
             this.filters.push(element.target.value);
           }
-          else if (! element.target.checked) {
+          else {
             const index = this.filters.indexOf(element.target.value);
             this.filters.splice(index, 1);
           }
@@ -74,7 +84,7 @@
       });
     }
     hideBooks() {
-      for (let book of this.data) {
+      for (const book of this.data) {
         if (book.details.adults == true && this.filters.includes('adults')) {
           if (document.querySelector(select.containerOf.bookImg).getAttribute('data-id') == book.id) {
             document.querySelector(`[data-id="${book.id}"]`).classList.add('hidden');
@@ -100,11 +110,17 @@
 
       if (rating < 6) {
         return 'linear-gradient(to bottom,  #fefcea 0%, #f1da36 100%)';
-      } else if (rating > 6 && rating <= 8) {
+      }
+      
+      if (rating > 6 && rating <= 8) {
         return 'linear-gradient(to bottom, #b4df5b 0%,#b4df5b 100%)';
-      } else if (rating > 8 && rating <= 9) {
+      }
+      
+      if (rating > 8 && rating <= 9) {
         return 'linear-gradient(to bottom, #299a0b 0%, #299a0b 100%)';
-      } else if (rating > 9) {
+      } 
+      
+      if (rating > 9) {
         return 'linear-gradient(to bottom, #ff0084 0%,#ff0084 100%)';
       }
     }
